@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { svgPathProperties } from 'svg-path-properties'
-import logoSvgRaw from '../../logo-108-anim.svg?raw'
-import congratulationsSound from '../sounds/congratulations.mp3'
-import failSound from '../sounds/fail.mp3'
-import nyanSound from '../sounds/nyan.mp3'
-import successSound from '../sounds/success.mp3'
+import logoSvgRaw from './assets/logo-108-anim.svg?raw'
+import congratulationsSound from './assets/sounds/congratulations.mp3'
+import failSound from './assets/sounds/fail.mp3'
+import nyanSound from './assets/sounds/nyan.mp3'
+import successSound from './assets/sounds/success.mp3'
 
 type Point = { x: number, y: number, t: number }
 type Segment = { from: Point, to: Point, width: number, color: string, dist: number }
@@ -232,9 +232,7 @@ export default function Draw108() {
     return { left: offsetX, top: offsetY, width: drawW, height: drawH }
   }, [transform, viewport, vb])
 
-  const logoSvgForOverlay = useMemo(() => {
-    return logoSvgRaw.replace('<svg ', '<svg style="width:100%;height:100%" ')
-  }, [logoSvgRaw])
+  const logoSvgForOverlay = logoSvgRaw.replace('<svg ', '<svg style="width:100%;height:100%" ')
 
   useEffect(() => {
     try {
@@ -246,7 +244,7 @@ export default function Draw108() {
       triesRef.current = Number.isFinite(valTries) ? valTries : 0
       congratsPlayedRef.current = !!JSON.parse(localStorage.getItem('draw108_congratsPlayed') || 'false')
       setIsFlipped(triesRef.current >= 100 && triesRef.current < 103)
-    } catch {}
+    } catch { /* empty */ }
   }, [])
 
   function getShareText(score: number): string {
@@ -349,7 +347,7 @@ export default function Draw108() {
       }
 
       // Drawing area border
-      const [minX, minY, vbW, vbH] = vb
+      const [, , vbW, vbH] = vb
       const drawW = vbW * scale
       const drawH = vbH * scale
       ctx.save()
@@ -535,7 +533,7 @@ export default function Draw108() {
       if (captureCanvasCallback.current) {
         const cb = captureCanvasCallback.current
         captureCanvasCallback.current = null
-        canvasEl.toBlob(cb, 'image/png')
+        canvasEl?.toBlob(cb, 'image/png')
       }
 
       raf = requestAnimationFrame(draw)
@@ -623,7 +621,7 @@ export default function Draw108() {
       if (finishedRef.current) {
         triesRef.current += 1
         setIsFlipped(triesRef.current >= 100 && triesRef.current < 103)
-        try { localStorage.setItem('draw108_tries', String(triesRef.current)) } catch {}
+        try { localStorage.setItem('draw108_tries', String(triesRef.current)) } catch { /* empty */ }
         segmentsRef.current = []
         accuracyRef.current = 0
         goodSum = 0
@@ -710,7 +708,7 @@ export default function Draw108() {
 
           if (score > 70 && !congratsPlayedRef.current) {
             congratsPlayedRef.current = true
-            try { localStorage.setItem('draw108_congratsPlayed', 'true') } catch {}
+            try { localStorage.setItem('draw108_congratsPlayed', 'true') } catch { /* empty */ }
             playSound(sounds.congratulations)
             sounds.congratulations.onended = () => {
               playSound(sounds.nyan)
@@ -722,7 +720,7 @@ export default function Draw108() {
 
           if (isNewBest) {
             bestRef.current = score
-            try { localStorage.setItem('draw108_best', String(score)) } catch {}
+            try { localStorage.setItem('draw108_best', String(score)) } catch { /* empty */ }
             newBestRef.current = true
             newBestAtRef.current = performance.now()
           }
